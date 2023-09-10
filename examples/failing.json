@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1",
+  "complete": true,
+  "seed": 7,
+  "policy": { "capacity": 2, "ttlMs": 100, "maxAttempts": 2, "retryDelayMs": 10, "successPercent": 100, "duplicate": "suppress", "overflow": "reject-new" },
+  "events": [
+    { "at": 0, "kind": "enqueue", "id": "opaque-a" },
+    { "at": 0, "kind": "enqueue", "id": "opaque-b" },
+    { "at": 0, "kind": "enqueue", "id": "opaque-c" },
+    { "at": 1, "kind": "connect" }
+  ]
+}

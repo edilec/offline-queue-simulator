@@ -1,13 +1,18 @@
 {
   "name": "offline-queue-simulator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Simulate offline writes, queue limits and replay after reconnection.",
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test"
+    "lint": "node --check src/index.mjs && node --check bin/offline-queue-simulator.mjs",
+    "test": "node --test",
+    "check": "npm run lint && npm test"
+  },
+  "bin": {
+    "offline-queue-simulator": "./bin/offline-queue-simulator.mjs"
   },
   "license": "MIT",
   "repository": {
