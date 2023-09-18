@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { realpath, readFile } from 'node:fs/promises';
-import { isAbsolute, relative, resolve } from 'node:path';
+import { realpath, readFile, stat } from 'node:fs/promises';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { LIMITS, incomplete, parseStrictJson, simulateQueue } from '../src/index.mjs';
 
 function args(argv) {
@@ -14,16 +14,24 @@ function args(argv) {
 }
 function inside(root, path) {
   const rel = relative(root, path);
-  return rel === '' || (rel !== '..' && !rel.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) && !isAbsolute(rel));
+  return rel === '' || (rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel));
 }
 const options = args(process.argv.slice(2));
 if (!options) {
   process.stderr.write('Usage: offline-queue-simulator --root DIR --input FILE\n');
   process.exitCode = 2;
 } else {
+  let root;
+  try {
+    root = await realpath(options['--root']);
+    if (!(await stat(root)).isDirectory()) root = null;
+  } catch { root = null; }
+  if (!root) {
+    process.stderr.write('Invalid root directory.\n');
+    process.exitCode = 2;
+  } else {
   let result;
   try {
-    const root = await realpath(options['--root']);
     const input = await realpath(resolve(root, options['--input']));
     if (!inside(root, input)) throw new Error('outside root');
     const bytes = await readFile(input);
@@ -38,4 +46,5 @@ if (!options) {
   } catch { result = incomplete('input-unreadable'); }
   process.stdout.write(`${JSON.stringify(result)}\n`);
   process.exitCode = result.status === 'pass' ? 0 : result.status === 'fail' ? 1 : 2;
+  }
 }

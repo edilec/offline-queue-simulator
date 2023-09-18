@@ -72,5 +72,6 @@ test('CLI confines reads, requires strict UTF-8 and has empty usage stdout', asy
   const root = await mkdtemp(join(tmpdir(), 'queue-')); await writeFile(join(root, 'good.json'), JSON.stringify(doc())); assert.equal(run(root, 'good.json').status, 0);
   await writeFile(join(root, 'bad.json'), Buffer.from([0xff])); assert.equal(JSON.parse(run(root, 'bad.json').stdout).status, 'incomplete');
   await symlink(tmpdir(), join(root, 'escape')); const escaped = run(root, 'escape/nonexistent.json'); assert.equal(escaped.status, 2); assert.equal(JSON.parse(escaped.stdout).status, 'incomplete');
+  const invalidRoot = run(join(root, 'no-directory'), 'good.json'); assert.equal(invalidRoot.status, 2); assert.equal(invalidRoot.stdout, '');
   const usage = spawnSync(process.execPath, ['bin/offline-queue-simulator.mjs', '--root', root, '--input', 'good.json', '--unknown'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' }); assert.equal(usage.status, 2); assert.equal(usage.stdout, '');
 });
