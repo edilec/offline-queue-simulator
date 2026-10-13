@@ -8,7 +8,7 @@ import { simulateQueue, LIMITS, parseStrictJson } from '../src/index.mjs';
 
 const event = (at, kind, id) => id === undefined ? { at, kind } : { at, kind, id };
 const doc = (events = [event(0, 'enqueue', 'a'), event(1, 'connect')], policy = {}) => ({ schemaVersion: '1', complete: true, seed: 7, policy: { capacity: 2, ttlMs: 100, maxAttempts: 2, retryDelayMs: 10, successPercent: 100, duplicate: 'suppress', overflow: 'reject-new', ...policy }, events });
-const run = (root, input) => spawnSync(process.execPath, ['bin/offline-queue-simulator.mjs', '--root', root, '--input', input], { cwd: new URL('..', import.meta.url), encoding: 'utf8', env: { ...process.env, NODE_OPTIONS: `--import=${new URL('../../migration-plan-template/support/deny-network.mjs', import.meta.url).href}` } });
+const run = (root, input) => spawnSync(process.execPath, ['bin/offline-queue-simulator.mjs', '--root', root, '--input', input], { cwd: new URL('..', import.meta.url), encoding: 'utf8', env: { ...process.env, NODE_OPTIONS: `--import=${new URL('./deny-network.mjs', import.meta.url).href}` } });
 
 test('good offline enqueue reconnect delivers once in FIFO order without action', () => {
   const r = simulateQueue(doc([event(0, 'enqueue', 'a'), event(0, 'enqueue', 'b'), event(1, 'connect')]));
